@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PAMIT NGGIH | Pantauan Aman Murid Ijin Terpadu</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: #334155;
+    }
+
+    /* --- GLASS & PANEL --- */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.05), 0 8px 16px -8px rgba(0, 0, 0, 0.04);
+    }
+
+    /* --- INPUT STYLES --- */
+    .input-wrapper { position: relative; margin-bottom: 0.5rem; }
+    
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Floating Label Styling */
+    .floating-label {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      transform: translateY(-50%);
+      color: #475569;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: transparent;
+      padding: 0 0.25rem;
+      font-weight: 600;
+      z-index: 10;
+    }
+
+    /* Moves label up when focused or filled */
+    .input-wrapper:focus-within .floating-label,
+    .input-wrapper.filled .floating-label {
+      top: -0.65rem;
+      left: 0.75rem;
+      font-size: 0.75rem;
+      color: #0d9488;
+      font-weight: 800;
+      background-color: #ffffff;
+      border-radius: 4px;
+      padding: 0 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .input-field {
+      width: 100%;
+      padding-top: 1.25rem;
+      padding-bottom: 1.25rem;
+      padding-left: 1rem;
+      padding-right: 3rem;
+      transition: all 0.2s ease;
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.75rem;
+      color: #0f172a;
+      font-size: 1rem;
+      font-weight: 600;
+      appearance: none;
+    }
+
+    /* Select specific styles */
+    select.input-field { color: #0f172a; font-weight: 600; }
+    select.input-field option { color: #0f172a; font-weight: 600; }
+    select.input-field option:disabled { color: #94a3b8; }
+
+    .input-field:focus {
+      border-color: #0d9488;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      background-color: #fff;
+    }
+
+    select.input-field {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 1rem center;
+      background-repeat: no-repeat;
+      background-size: 1.2em 1.2em;
+    }
+
+    .input-error {
+      border-color: #f43f5e !important;
+      background-color: #fff1f2;
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    .input-error:focus { box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1) !important; }
+
+    .text-error {
+      color: #e11d48;
+      font-size: 0.75rem;
+      margin-top: 0.35rem;
+      display: none;
+      font-weight: 700;
+    }
+
+    .input-error + .floating-label { color: #e11d48 !important; }
+    
+    .box-error {
+      border: 1px solid #fecdd3 !important;
+      background-color: #fff1f2 !important;
+    }
+
+    /* --- CHECKBOX --- */
+    .checkbox-wrapper { position: relative; display: flex; align-items: flex-start; }
+    .checkbox-modern {
+      appearance: none;
+      background-color: #fff;
+      margin: 0;
+      color: currentColor;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.5rem;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+    .checkbox-modern::before {
+      content: "";
+      width: 0.75rem;
+      height: 0.75rem;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      box-shadow: inset 1em 1em white;
+      transform-origin: center;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+      background-color: white;
+    }
+    .checkbox-modern:checked { background-color: #0f766e; border-color: #0f766e; }
+    .checkbox-modern:checked::before { transform: scale(1); }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
+    /* --- PROGRESS & LOADER --- */
+    .progress-container {
+      height: 0.5rem;
+      width: 100%;
+      background-color: #f1f5f9;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #14b8a6, #0f766e);
+      width: 0%;
+      transition: width 0.5s ease-out;
+      border-radius: 9999px;
+    }
+    .loader-dots {
+      width: 3.5rem;
+      height: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .loader-dots div {
+      width: 0.4rem;
+      height: 0.4rem;
+      background-color: #0d9488;
+      border-radius: 50%;
+      animation: loader-dots 1.4s infinite ease-in-out both;
+    }
+    .loader-dots div:nth-child(1) { animation-delay: -0.32s; }
+    .loader-dots div:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes loader-dots {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* --- CHATBOT STYLES --- */
+    .chat-enter { animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .message-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      position: relative;
+      word-wrap: break-word;
+    }
+    .message-bot {
+      background: #f0fdfa;
+      color: #0f766e;
+      border-radius: 12px 12px 12px 2px;
+      border: 1px solid #ccfbf1;
+    }
+    .message-user {
+      background: #0d9488;
+      color: white;
+      border-radius: 12px 12px 2px 12px;
+    }
+    .typing-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      margin-right: 2px;
+      background-color: #0f766e;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+    html { scroll-behavior: smooth; }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              900: '#134e4a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="text-slate-600 min-h-screen relative selection:bg-brand-100 selection:text-brand-900 pb-10">
+
+  <!-- Background Ambient Glows -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-200/30 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-indigo-200/30 rounded-full blur-[100px] translate-x-1/3 translate-y-1/3"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- CHATBOT UI -->
+  <div class="fixed bottom-6 right-6 z-[60] flex flex-col items-end pointer-events-none">
+    <div id="chatWindow" class="hidden pointer-events-auto w-[90vw] md:w-[380px] h-[500px] flex flex-col glass-panel rounded-2xl shadow-2xl border border-brand-100 chat-enter mb-4 overflow-hidden transform origin-bottom-right transition-all duration-300">
+      <div class="bg-brand-600 text-white p-4 flex justify-between items-center shadow-md z-10">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
+              <i class="fas fa-robot text-lg"></i>
+            </div>
+            <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-brand-600 rounded-full"></span>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm">PAMIT-Bot</h4>
+            <p class="text-[10px] text-brand-100 opacity-90">Asisten Virtual Sekolah</p>
+          </div>
+        </div>
+        <button id="closeChatBtn" type="button" class="text-white/70 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 scroll-smooth">
+        <div class="flex justify-start">
+          <div class="message-bubble message-bot shadow-sm">
+            <p class="font-semibold text-xs mb-1 text-brand-700">PAMIT-Bot</p>
+            <p>Halo! Jika Anda kesulitan mengisi formulir, tanyakan saja. Jangan lupa, setelah izin selesai, wajib meminta <b>Kode Konfirmasi</b> ya!</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="chatSuggestions" class="px-4 py-2 bg-white border-t border-slate-100 flex flex-wrap gap-2 overflow-x-auto no-scrollbar">
+        <button type="button" class="suggestion-chip px-3 py-1.5 bg-brand-50 text-brand-700 text-[11px] font-semibold rounded-full border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" data-query="panduan lengkap cara mengisi">
+          Panduan Lengkap
+        </button>
+        <button type="button" class="suggestion-chip px-3 py-1.5 bg-brand-50 text-brand-700 text-[11px] font-semibold rounded-full border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" data-query="aturan pulang dan konfirmasi">
+          Aturan Pulang?
+        </button>
+        <button type="button" class="suggestion-chip px-3 py-1.5 bg-brand-50 text-brand-700 text-[11px] font-semibold rounded-full border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" data-query="validasi gagal tidak bisa kirim">
+          Gagal Kirim?
+        </button>
+        <!-- NEW: Admin Contact Button -->
+        <button type="button" class="suggestion-chip px-3 py-1.5 bg-green-50 text-green-700 text-[11px] font-bold rounded-full border border-green-200 hover:bg-green-100 transition-colors whitespace-nowrap flex items-center gap-1" data-action="contactAdmin">
+           <i class="fab fa-whatsapp"></i> Hubungi Admin
+        </button>
+      </div>
+
+      <form id="chatInputForm" class="p-3 bg-white border-t border-slate-100 flex gap-2">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Tanyakan kendala Anda..."
+          class="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+          autocomplete="off"
+        />
+        <button type="submit" class="w-10 h-10 bg-brand-600 hover:bg-brand-700 text-white rounded-xl flex items-center justify-center shadow-md transition-all active:scale-95">
+          <i class="fas fa-paper-plane text-sm"></i>
+        </button>
+      </form>
+    </div>
+
+    <button id="chatToggleBtn" type="button" class="pointer-events-auto w-14 h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full shadow-lg shadow-brand-500/40 flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 active:scale-95 group">
+      <i class="fas fa-comments text-xl group-hover:rotate-12 transition-transform"></i>
+      <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-brand-600"></span>
+      </span>
+    </button>
+  </div>
+
+  <div class="container mx-auto max-w-4xl px-4 pt-6 md:pt-10">
+    <header class="text-center mb-8 md:mb-12">
+      <div class="inline-flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-[1.5rem] bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] mb-6 relative overflow-hidden border-4 border-white ring-1 ring-slate-900/5 transition-transform duration-300 hover:scale-105 group">
+        <img src="https://z-cdn-media.chatglm.cn/files/06af6ca0-2b70-40b2-a5a1-335f438454d0.png?auth_key=1869572356-edbc3835aba94fb3bbf2c825648b4350-0-a1b2c9ac06ba56e4f8a2435e77aba0a6"
+             alt="Logo Skanilan Tech"
+             class="w-full h-full object-contain p-4 relative z-10 transition-transform duration-500 group-hover:rotate-3" />
+        <div class="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20"></div>
+      </div>
+
+      <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 tracking-tight mb-2">PAMIT NGGIH</h1>
+      <p class="text-slate-500 font-medium text-sm md:text-base mb-5">Pantauan Aman Murid Ijin Terpadu</p>
+
+      <div class="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold shadow-sm">
+        <span class="relative flex h-2 w-2 mr-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span id="dbStatus">Database Terhubung</span>
+      </div>
+    </header>
+
+    <div class="glass-panel rounded-3xl relative overflow-hidden border-t-4 border-t-brand-500" id="formCard">
+      <div class="px-6 md:px-8 pt-6 pb-4 border-b border-slate-100 bg-white/40">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i class="fas fa-file-signature text-brand-600"></i>
+              Formulir Pengajuan Izin
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Lengkapi data di bawah ini dengan benar dan teliti.</p>
+          </div>
+
+          <div class="w-full sm:w-auto flex-1 sm:max-w-[180px]">
+            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase mb-1.5">
+              <span>Progress</span>
+              <span id="progressText">25%</span>
+            </div>
+            <div class="progress-container">
+              <div id="formProgress" class="progress-bar" style="width: 25%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form id="permissionForm" class="p-6 md:p-8 space-y-8 md:space-y-12" novalidate>
+
+        <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-xl p-4 flex items-start gap-3 shadow-sm">
+          <div class="bg-amber-100 text-amber-600 w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+            <i class="fas fa-bell text-xs"></i>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-amber-800 uppercase tracking-wide">Aturan Kepulangan Wajib</h4>
+            <p class="text-xs text-amber-700 mt-1 leading-relaxed">
+              Setelah selesai izin dan kembali ke sekolah, siswa <b>WAJIB</b> melapor ke <b>Guru Piket</b> untuk mendapatkan <b>Kode Konfirmasi</b> sebelum diizinkan pulang ke rumah.
+            </p>
+          </div>
+        </div>
+
+        <!-- 1. Konfigurasi -->
+        <section id="section-config">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 shadow-sm">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">Konfigurasi Kelas</h3>
+              <p class="text-xs text-slate-500 font-medium">Tentukan jumlah siswa dan kelas.</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="relative input-wrapper">
+                <label for="jumlahSiswa" class="sr-only">Jumlah Siswa</label>
+                <select id="jumlahSiswa" name="jumlahSiswa" class="input-field">
+                  <option value="" disabled selected>&nbsp;</option>
+                </select>
+                <label for="jumlahSiswa" class="floating-label">Jumlah Siswa</label>
+                <div id="error-jumlahSiswa" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib dipilih</div>
+              </div>
+
+              <div class="relative input-wrapper">
+                <label for="kelas" class="sr-only">Kelas</label>
+                <select id="kelas" name="kelas" class="input-field">
+                  <option value="" disabled selected>&nbsp;</option>
+                </select>
+                <label for="kelas" class="floating-label">Kelas</label>
+                <div id="error-kelas" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib dipilih</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Checklist -->
+        <section id="section-checklist" class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center border border-indigo-200 shadow-sm">
+              <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">Pernyataan Izin</h3>
+              <p class="text-xs text-slate-500 font-medium">Pastikan persyaratan berikut terpenuhi.</p>
+            </div>
+          </div>
+
+          <div id="izinChecklistBox" class="space-y-4">
+            <label class="flex items-start gap-4 p-4 bg-white rounded-xl border border-indigo-50 cursor-pointer hover:border-indigo-200 hover:shadow-md transition-all group">
+              <div class="checkbox-wrapper mt-0.5">
+                <input type="checkbox" id="izinPengajar" name="izinPengajar" class="checkbox-modern" />
+              </div>
+              <div class="flex-1">
+                <span class="block text-sm font-bold text-slate-800 group-hover:text-brand-700 transition-colors">Izin dari Guru Pengajar</span>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Siswa telah menghubungi Guru Pengajar mata pelajaran yang bersangkutan dan mendapatkan persetujuan.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-4 p-4 bg-white rounded-xl border border-indigo-50 cursor-pointer hover:border-indigo-200 hover:shadow-md transition-all group">
+              <div class="checkbox-wrapper mt-0.5">
+                <input type="checkbox" id="izinPiket" name="izinPiket" class="checkbox-modern" />
+              </div>
+              <div class="flex-1">
+                <span class="block text-sm font-bold text-slate-800 group-hover:text-brand-700 transition-colors">Izin dari Guru Piket/BK/Kesiswaan</span>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Siswa telah mendapatkan persetujuan dari Guru Piket/BK/Kesiswaan sebelum mengajukan izin keluar.</p>
+              </div>
+            </label>
+          </div>
+
+          <div id="error-checklist" class="text-error mt-5 font-bold bg-red-50 p-3 rounded-lg border border-red-100 hidden text-xs">
+            <i class="fas fa-triangle-exclamation mr-1"></i> Semua pernyataan wajib dicentang.
+          </div>
+        </section>
+
+        <!-- 3. Data Siswa -->
+        <section id="section-students">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shadow-sm">
+              <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">Data Siswa</h3>
+              <p class="text-xs text-slate-500 font-medium">Pilih nama siswa sesuai konfigurasi.</p>
+            </div>
+          </div>
+
+          <div id="studentsContainer" class="space-y-4">
+            <div class="text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
+              <div class="w-12 h-12 rounded-full bg-white text-slate-300 flex items-center justify-center mx-auto shadow-sm mb-3">
+                <i class="fas fa-users text-lg"></i>
+              </div>
+              <p class="text-slate-400 font-bold text-sm">Pilih Kelas untuk memuat data.</p>
+            </div>
+          </div>
+
+          <template id="studentRowTpl">
+            <div class="student-row bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200">
+              <div class="grid grid-cols-12 gap-4 items-center">
+                <div class="col-span-12 md:col-span-1 flex items-center gap-3 border-b md:border-b-0 md:border-r border-slate-100 pb-3 md:pb-0 md:pr-4">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase">No</span>
+                  <span class="row-no text-2xl font-black text-brand-600 leading-none">1</span>
+                </div>
+
+                <div class="col-span-12 md:col-span-8 lg:col-span-7 relative input-wrapper">
+                  <label class="sr-only">Nama Siswa</label>
+                  <select class="student-nama input-field">
+                    <option value="" disabled selected>&nbsp;</option>
+                  </select>
+                  <label class="floating-label">Nama Siswa</label>
+                  <div class="row-error text-error"><i class="fas fa-circle-exclamation mr-1"></i> Pilih nama siswa</div>
+                </div>
+
+                <div class="col-span-12 md:col-span-3 lg:col-span-4 relative input-wrapper filled">
+                  <label class="sr-only">NIS</label>
+                  <input type="text" class="student-nis input-field bg-slate-50 text-slate-500 border-slate-200 font-mono text-sm tracking-wider text-center md:text-left" placeholder=" " readonly />
+                  <label class="floating-label bg-slate-50 px-1 text-xs text-slate-400">NIS</label>
+                </div>
+              </div>
+            </div>
+          </template>
+        </section>
+
+        <!-- 4. Detail Keperluan -->
+        <section id="section-details">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide">Detail Keperluan</h3>
+              <p class="text-xs text-slate-500 font-medium">Informasi waktu dan alasan izin.</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+              <div class="md:col-span-2 relative input-wrapper">
+                <label for="keperluan" class="sr-only">Keperluan Izin</label>
+                <input type="text" id="keperluan" name="keperluan" class="input-field" placeholder=" " />
+                <label for="keperluan" class="floating-label">Alasan Keperluan</label>
+                <div id="error-keperluan" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib diisi</div>
+              </div>
+
+              <div class="relative input-wrapper">
+                <label for="namaGuru" class="sr-only">Guru Piket</label>
+                <select id="namaGuru" name="namaGuru" class="input-field">
+                  <option value="" disabled selected>&nbsp;</option>
+                </select>
+                <label for="namaGuru" class="floating-label">Guru Piket</label>
+                <div id="error-namaGuru" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib dipilih</div>
+              </div>
+
+              <div class="relative input-wrapper">
+                <label for="tanggal" class="sr-only">Tanggal Izin</label>
+                <input type="date" id="tanggal" name="tanggal" class="input-field" />
+                <label for="tanggal" class="floating-label">Tanggal</label>
+                <div id="error-tanggal" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib dipilih</div>
+              </div>
+
+              <!-- DROPDOWN ANGKA 1-10 -->
+              <div class="md:col-span-2 mt-4 pt-4 border-t border-slate-100">
+                <div class="flex items-center gap-2 mb-4 text-slate-400">
+                  <i class="far fa-clock text-xs"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider">Rentang Waktu Izin</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  
+                  <div class="relative input-wrapper">
+                    <label for="jamAwal" class="sr-only">Jam Keluar</label>
+                    <select id="jamAwal" name="jamAwal" class="input-field">
+                      <option value="" disabled selected>&nbsp;</option>
+                      <!-- Opsi 1-10 akan diisi oleh JS -->
+                    </select>
+                    <label for="jamAwal" class="floating-label">Jam Keluar</label>
+                    <div id="error-jamAwal" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib dipilih</div>
+                  </div>
+
+                  <div class="relative input-wrapper">
+                    <label for="jamAkhir" class="sr-only">Jam Kembali</label>
+                    <select id="jamAkhir" name="jamAkhir" class="input-field">
+                      <option value="" disabled selected>&nbsp;</option>
+                      <!-- Opsi 1-10 akan diisi oleh JS -->
+                    </select>
+                    <label for="jamAkhir" class="floating-label">Jam Kembali</label>
+                    <div id="error-jamAkhir" class="text-error"><i class="fas fa-circle-exclamation mr-1"></i> Wajib dipilih</div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <div id="formStatus" class="hidden bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+          <div class="flex items-center justify-center gap-3">
+            <div class="loader-dots"><div></div><div></div><div></div></div>
+            <div class="text-left">
+              <h5 class="font-bold text-slate-800 text-sm">Memproses Data...</h5>
+              <p class="text-slate-500 text-xs">Mohon tunggu sebentar</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col-reverse sm:flex-row gap-4 pt-6 border-t border-slate-100">
+          <button type="reset" id="resetBtn" class="w-full sm:w-1/3 px-6 py-4 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold hover:bg-slate-50 hover:text-slate-800 transition-all shadow-sm active:scale-[0.98] text-sm">
+            <i class="fas fa-rotate-left mr-2"></i> Reset Formulir
+          </button>
+
+          <button type="submit" id="submitBtn" class="w-full sm:w-2/3 px-6 py-4 rounded-xl bg-brand-600 text-white font-bold shadow-lg shadow-brand-500/20 hover:bg-brand-700 hover:shadow-brand-500/30 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] text-sm flex items-center justify-center">
+            <span id="btnText"><i class="fas fa-paper-plane mr-2"></i> Kirim Permohonan</span>
+            <div id="loadingSpinner" class="hidden ml-2">
+              <div class="loader-dots"><div></div><div></div><div></div></div>
+            </div>
+          </button>
+        </div>
+
+        <div id="afterSubmitActions" class="hidden">
+          <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+            <div class="flex items-center gap-4 text-center md:text-left">
+              <div class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 shrink-0">
+                <i class="fas fa-check text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-emerald-900 text-lg">Permohonan Terkirim!</h4>
+                <p class="text-emerald-700 text-sm mt-1 font-bold">
+                  <i class="fas fa-exclamation-triangle text-amber-600 mr-1"></i> Ingat: Setelah kembali ke sekolah, <b>WAJIB</b> minta Kode Konfirmasi ke Guru Piket.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-3 w-full md:w-auto">
+              <button type="button" id="printPdfBtn" class="flex-1 md:flex-none px-6 py-3 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-bold text-sm shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 w-full md:w-auto">
+                <i class="fas fa-print"></i> Cetak PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- FOOTER DENGAN FITUR KONTAK ADMIN -->
+    <footer class="mt-8 sm:mt-12 text-center text-slate-400 text-xs sm:text-sm font-medium opacity-80 pb-8">
+      
+      <!-- Admin Contact Card -->
+      <div class="max-w-md mx-auto mb-6 p-4 bg-white rounded-xl shadow-sm border border-slate-200 flex items-center justify-center gap-4 transition-transform hover:scale-[1.02]">
+        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center shrink-0 text-2xl">
+          <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="text-left">
+          <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kendala Teknis? Hubungi Admin</p>
+          <a href="https://wa.me/6285183218979?text=Halo%20Admin,%20saya%20mengalami%20kendala%20di%20aplikasi%20PAMIT%20NGGIH." target="_blank" class="text-sm md:text-base font-bold text-slate-800 hover:text-green-600 transition-colors flex items-center gap-2 mt-0.5">
+            +62 851-8321-8979
+            <i class="fas fa-external-link-alt text-[10px] text-slate-400"></i>
+          </a>
+        </div>
+      </div>
+
+      <p>© 2026 SkanilanTech; support by B-DIM Tech Bayu – Doni – Ivana – Mustaqimah</p>
+      <p class="mt-1 text-[10px] sm:text-xs">Terhubung ke: <span class="font-bold text-brand-600">Spreadsheet Database Sekolah</span></p>
+    </footer>
+  </div>
+
+  <script>
+    const CONFIG = {
+      MAX_STUDENTS: 36,
+      SPREADSHEET_ID: '180hXN2MVeAORQrl_QMc9KrcUTSqVoYVl1KWgybJ5gQ8',
+      APP_VERSION: '4.5.0-1to10-final',
+      ADMIN_WA: '6285183218979'
+    };
+
+    const state = {
+      currentNamaList: [],
+      currentNamaMap: {},
+      selectedNames: new Set(),
+      pdfUrl: '',
+      formProgress: 25,
+      isOnline: true,
+      isChatOpen: false
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    /* =========================
+       UI HELPERS
+    ========================= */
+
+    function showToast(message, type = 'info') {
+      const container = $('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const baseClasses = "pointer-events-auto w-full p-4 rounded-xl shadow-lg flex items-start gap-3 transform transition-all duration-300 translate-x-full opacity-0 border-l-4";
+
+      const styles = {
+        success: 'bg-white border-emerald-500 text-emerald-800',
+        error: 'bg-white border-rose-500 text-rose-800',
+        info: 'bg-white border-blue-500 text-blue-800',
+        warning: 'bg-white border-amber-500 text-amber-800'
+      };
+
+      const icons = {
+        success: '<i class="fas fa-check-circle mt-0.5 text-emerald-500 text-lg"></i>',
+        error: '<i class="fas fa-times-circle mt-0.5 text-rose-500 text-lg"></i>',
+        info: '<i class="fas fa-info-circle mt-0.5 text-blue-500 text-lg"></i>',
+        warning: '<i class="fas fa-exclamation-circle mt-0.5 text-amber-500 text-lg"></i>'
+      };
+
+      toast.className = `${baseClasses} ${styles[type] || styles.info}`;
+      toast.innerHTML = `
+        ${icons[type] || icons.info}
+        <div class="flex-1">
+          <p class="font-bold text-sm leading-tight">${message}</p>
+        </div>
+        <button type="button" class="text-slate-400 hover:text-slate-600 leading-none" onclick="this.parentElement.remove()">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    function updateFormProgress(percent) {
+      const progressBar = $('formProgress');
+      const progressText = $('progressText');
+
+      if (progressBar) {
+        state.formProgress = Math.min(Math.max(percent, 0), 100);
+        progressBar.style.width = `${state.formProgress}%`;
+      }
+      if (progressText) progressText.textContent = `${state.formProgress}%`;
+    }
+
+    function showFormStatus(show, message = '') {
+      const statusEl = $('formStatus');
+      if (!statusEl) return;
+
+      if (show) {
+        statusEl.classList.remove('hidden');
+        if (message) {
+          const h = statusEl.querySelector('h5');
+          if (h) h.textContent = message;
+        }
+      } else {
+        statusEl.classList.add('hidden');
+      }
+    }
+
+    function setLoading(loading) {
+      const btn = $('submitBtn');
+      const btnText = $('btnText');
+      const spinner = $('loadingSpinner');
+
+      if (btn) {
+        btn.disabled = loading;
+        btn.classList.toggle('opacity-75', loading);
+        btn.classList.toggle('cursor-not-allowed', loading);
+      }
+      if (spinner) spinner.classList.toggle('hidden', !loading);
+
+      if (btnText) {
+        btnText.innerHTML = loading
+          ? '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim Data...'
+          : '<i class="fas fa-paper-plane mr-2"></i> Kirim Permohonan';
+      }
+    }
+
+    function setError(fieldId, show, message = '') {
+      const errorEl = $(`error-${fieldId}`);
+      const field = $(fieldId);
+      const container = field ? field.closest('.time-container, .input-wrapper') : null;
+
+      if (field) {
+        if (show) field.classList.add('input-error');
+        else field.classList.remove('input-error');
+      }
+
+      if (!errorEl) return;
+
+      if (show) {
+        errorEl.style.display = 'block';
+        if (message) errorEl.innerHTML = `<i class="fas fa-circle-exclamation mr-1"></i> ${message}`;
+      } else {
+        errorEl.style.display = 'none';
+      }
+    }
+
+    function setChecklistError(show) {
+      const errorEl = $('error-checklist');
+      const checklistBox = $('izinChecklistBox');
+
+      if (errorEl) errorEl.classList.toggle('hidden', !show);
+      if (checklistBox) {
+        if (show) checklistBox.classList.add('box-error');
+        else checklistBox.classList.remove('box-error');
+      }
+    }
+
+    function printPdfDirectly() {
+      if (!state.pdfUrl) {
+        showToast('URL PDF belum tersedia.', 'error');
+        return;
+      }
+      window.open(state.pdfUrl, '_blank');
+    }
+
+    function openWhatsAppAdmin() {
+      const text = encodeURIComponent("Halo Admin, saya mengalami kendala di aplikasi PAMIT NGGIH.");
+      window.open(`https://wa.me/${CONFIG.ADMIN_WA}?text=${text}`, '_blank');
+    }
+
+    /* =========================
+       FLOATING LABEL FILL STATE
+    ========================= */
+
+    function syncFilledState(el) {
+      if (!el) return;
+      const wrapper = el.closest('.input-wrapper');
+      if (!wrapper) return;
+
+      const hasValue = (() => {
+        if (el.tagName === 'SELECT') return !!el.value;
+        if (el.type === 'date') return !!el.value;
+        return (el.value || '').trim().length > 0;
+      })();
+
+      wrapper.classList.toggle('filled', hasValue);
+    }
+
+    function initFilledStateAll() {
+      document.querySelectorAll('.input-wrapper .input-field').forEach(el => syncFilledState(el));
+    }
+
+    /* =========================
+       NORMALIZER DATA GAS
+    ========================= */
+
+    function normalizeList(input) {
+      if (!input) return [];
+
+      if (typeof input === 'object' && !Array.isArray(input)) {
+        const possible = input.data || input.list || input.items || input.result || input.guru || input.siswa;
+        if (possible) input = possible;
+      }
+
+      if (!Array.isArray(input)) return [];
+
+      const is2D = Array.isArray(input[0]);
+      if (is2D) input = input.flat();
+
+      const uniqueSet = new Set(
+        input
+          .map(v => {
+            if (v == null) return '';
+            if (typeof v === 'object') return String(v.nama || v.label || v.text || v.value || v.name || '').trim();
+            return String(v).trim();
+          })
+          .filter(v => v.length > 0)
+      );
+
+      return Array.from(uniqueSet);
+    }
+
+    function fillSelect(selectEl, data, placeholder = 'Pilih opsi') {
+      if (!selectEl) return;
+
+      selectEl.innerHTML = `<option value="" disabled selected>&nbsp;</option>`;
+
+      const list = normalizeList(data);
+
+      list.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        selectEl.appendChild(option);
+      });
+
+      syncFilledState(selectEl);
+    }
+
+    // Fungsi khusus untuk mengisi dropdown Angka 1-10
+    function fillNumberSelects() {
+      const selectAwal = $('jamAwal');
+      const selectAkhir = $('jamAkhir');
+
+      if (selectAwal && selectAkhir) {
+        for (let i = 1; i <= 10; i++) {
+          const opt1 = document.createElement('option');
+          opt1.value = i;
+          opt1.textContent = i;
+          selectAwal.appendChild(opt1);
+
+          const opt2 = document.createElement('option');
+          opt2.value = i;
+          opt2.textContent = i;
+          selectAkhir.appendChild(opt2);
+        }
+      }
+    }
+
+    /* =========================
+       DATA LOADING
+    ========================= */
+
+    async function loadDataFromSpreadsheet() {
+      const statusText = $('dbStatus');
+      const badgeContainer = statusText ? statusText.parentElement : null;
+
+      const setOfflineUI = () => {
+        state.isOnline = false;
+        if (statusText) statusText.textContent = 'Mode Offline (Demo)';
+        if (badgeContainer) {
+          badgeContainer.classList.remove('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
+          badgeContainer.classList.add('bg-amber-50', 'border-amber-200', 'text-amber-700');
+          const ping = badgeContainer.querySelector('.animate-ping');
+          if (ping) ping.classList.remove('animate-ping');
+        }
+      };
+
+      if (typeof google === 'undefined' || !google.script || !google.script.run) {
+        console.warn('Google Apps Script env tidak terdeteksi. Pakai mock data.');
+        setOfflineUI();
+        loadMockData();
+        return;
+      }
+
+      const runGAS = (fnName, ...args) => new Promise((resolve, reject) => {
+        try {
+          const runner = google.script.run
+            .withSuccessHandler(res => resolve(res))
+            .withFailureHandler(err => reject(err));
+          runner[fnName](...args);
+        } catch (e) {
+          reject(e);
+        }
+      });
+
+      try {
+        const kelasData = await runGAS('getKelasList');
+        fillSelect($('kelas'), kelasData, 'Pilih Kelas');
+
+        const guruData = await runGAS('getGuruPiketList');
+        const guruList = normalizeList(guruData);
+        fillSelect($('namaGuru'), guruList, 'Pilih Guru Piket');
+
+        showToast(`Data berhasil dimuat: ${(normalizeList(kelasData) || []).length} kelas, ${guruList.length} guru`, 'success');
+      } catch (error) {
+        console.error('Gagal load data:', error);
+        showToast('Gagal memuat data: ' + (error.message || error), 'error');
+        setOfflineUI();
+        loadMockData();
+      }
+    }
+
+    function loadMockData() {
+      const mockKelas = [
+        'X AKL 1', 'X AKL 2', 'X PPLG',
+        'XI AKL 1', 'XI PPLG',
+        'XII AKL 1', 'XII PPLG'
+      ];
+      fillSelect($('kelas'), mockKelas, 'Pilih Kelas');
+
+      const mockGuru = [
+        'Dr. Ahmad Santoso, M.Pd.',
+        'Drs. Budi Wijaya',
+        'Siti Rahayu, S.Pd.'
+      ];
+      fillSelect($('namaGuru'), mockGuru, 'Pilih Guru Piket');
+    }
+
+    function onKelasChange() {
+      const kelas = $('kelas') ? $('kelas').value : '';
+
+      state.currentNamaList = [];
+      state.currentNamaMap = {};
+      state.selectedNames.clear();
+
+      renderStudents();
+
+      if (!kelas) return;
+
+      updateFormProgress(50);
+
+      if (state.isOnline && google?.script?.run) {
+        google.script.run
+          .withSuccessHandler(data => {
+            buildNamaMap(data);
+            renderStudents();
+          })
+          .withFailureHandler(error => {
+            console.error('Failed to load siswa:', error);
+            showToast('Gagal memuat data siswa: ' + (error.message || error), 'error');
+          })
+          .getNamaSiswaByKelas(kelas);
+      } else {
+        const mockSiswa = Array.from({ length: 25 }, (_, i) => ({
+          nama: `Siswa ${i + 1} ${kelas}`,
+          nis: `NIS-${kelas.replace(/\s/g, '')}-${String(i + 1).padStart(3, '0')}`
+        }));
+        buildNamaMap(mockSiswa);
+        renderStudents();
+      }
+    }
+
+    function buildNamaMap(siswaList) {
+      state.currentNamaList = Array.isArray(siswaList) ? siswaList : [];
+      state.currentNamaMap = {};
+      state.currentNamaList.forEach(siswa => {
+        if (siswa && siswa.nama) state.currentNamaMap[siswa.nama] = siswa.nis || '';
+      });
+    }
+
+    function populateNamaOptions(selectEl) {
+      if (!selectEl) return;
+
+      const currentValue = selectEl.value;
+      const namaList = [...state.currentNamaList].sort((a, b) => (a.nama || '').localeCompare((b.nama || ''), 'id'));
+
+      selectEl.innerHTML = '<option value="" disabled selected>&nbsp;</option>';
+
+      namaList.forEach(siswa => {
+        const option = document.createElement('option');
+        option.value = siswa.nama;
+        option.textContent = siswa.nama;
+
+        if (state.selectedNames.has(siswa.nama) && siswa.nama !== currentValue) {
+          option.disabled = true;
+          option.textContent += ' (Dipilih)';
+        }
+        selectEl.appendChild(option);
+      });
+
+      if (currentValue) selectEl.value = currentValue;
+      syncFilledState(selectEl);
+    }
+
+    function refreshAllNamaOptions() {
+      document.querySelectorAll('.student-nama').forEach(select => populateNamaOptions(select));
+    }
+
+    function getSelectedStudentNames() {
+      const selected = new Set();
+      document.querySelectorAll('.student-nama').forEach(select => {
+        if (select.value) selected.add(select.value);
+      });
+      return selected;
+    }
+
+    function renderStudents() {
+      const count = parseInt($('jumlahSiswa') ? $('jumlahSiswa').value || "0" : "0", 10);
+      const container = $('studentsContainer');
+      const template = $('studentRowTpl');
+      if (!container || !template) return;
+
+      container.innerHTML = '';
+
+      if (count < 1) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-3">
+              <i class="fas fa-users-slash text-slate-400 text-lg"></i>
+            </div>
+            <h4 class="text-slate-500 font-bold text-sm">Belum ada siswa dipilih</h4>
+            <p class="text-slate-400 text-xs mt-1">Atur jumlah siswa di bagian Konfigurasi</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (state.currentNamaList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-blue-50/50 rounded-2xl border border-dashed border-blue-300">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-3">
+              <i class="fas fa-layer-group text-blue-400 text-lg"></i>
+            </div>
+            <h4 class="text-blue-600 font-bold text-sm">Pilih Kelas Terlebih Dahulu</h4>
+            <p class="text-blue-500 text-xs mt-1">Data siswa akan muncul setelah kelas dipilih</p>
+          </div>
+        `;
+        return;
+      }
+
+      for (let i = 1; i <= count; i++) {
+        const row = template.content.cloneNode(true);
+
+        row.querySelector('.row-no').textContent = i;
+
+        const namaSelect = row.querySelector('.student-nama');
+        const nisInput = row.querySelector('.student-nis');
+        const errorDiv = row.querySelector('.row-error');
+
+        namaSelect.id = `nama${i}`;
+        namaSelect.name = `nama${i}`;
+        nisInput.id = `nis${i}`;
+        nisInput.name = `nis${i}`;
+        if (errorDiv) errorDiv.id = `error-nama${i}`;
+
+        populateNamaOptions(namaSelect);
+
+        namaSelect.addEventListener('change', function () {
+          const selectedNama = this.value;
+          nisInput.value = state.currentNamaMap[selectedNama] || '';
+
+          state.selectedNames = getSelectedStudentNames();
+          setError(`nama${i}`, false);
+          refreshAllNamaOptions();
+          updateFormProgress(70);
+
+          syncFilledState(namaSelect);
+        });
+
+        container.appendChild(row);
+      }
+
+      updateFormProgress(65);
+    }
+
+    /* =========================
+       CHATBOT (FULL)
+    ========================= */
+
+    const ChatBot = {
+      init: function() {
+        this.toggleBtn = $('chatToggleBtn');
+        this.closeBtn = $('closeChatBtn');
+        this.window = $('chatWindow');
+        this.form = $('chatInputForm');
+        this.input = $('chatInput');
+        this.messages = $('chatMessages');
+        this.suggestions = $('chatSuggestions');
+
+        this.toggleBtn.addEventListener('click', () => this.toggle());
+        this.closeBtn.addEventListener('click', () => this.close());
+
+        this.form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleUserMessage();
+        });
+
+        this.suggestions.querySelectorAll('.suggestion-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            // Check if it's an action button (like Admin Contact)
+            const action = chip.getAttribute('data-action');
+            if (action === 'contactAdmin') {
+              this.addMessage("Membuka WhatsApp Admin...", 'user');
+              setTimeout(() => openWhatsAppAdmin(), 500);
+              return;
+            }
+
+            const query = chip.getAttribute('data-query');
+            this.input.value = query;
+            this.handleUserMessage();
+          });
+        });
+
+        this.toggleBtn.addEventListener('click', () => {
+          const badge = this.toggleBtn.querySelector('span.flex');
+          if (badge) badge.remove();
+        });
+      },
+
+      toggle: function() {
+        state.isChatOpen = !state.isChatOpen;
+        if (state.isChatOpen) {
+          this.window.classList.remove('hidden');
+          this.input.focus();
+        } else {
+          this.close();
+        }
+      },
+
+      close: function() {
+        state.isChatOpen = false;
+        this.window.classList.add('hidden');
+      },
+
+      scrollToBottom: function() {
+        this.messages.scrollTop = this.messages.scrollHeight;
+      },
+
+      addMessage: function(text, sender) {
+        const div = document.createElement('div');
+        div.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} chat-enter`;
+
+        let html = '';
+        if (sender === 'bot') {
+          html = `
+            <div class="message-bubble message-bot shadow-sm">
+              <p class="font-semibold text-xs mb-1 text-brand-700">PAMIT-Bot</p>
+              <p>${text}</p>
+            </div>
+          `;
+        } else {
+          html = `
+            <div class="message-bubble message-user shadow-sm">
+              <p>${text}</p>
+            </div>
+          `;
+        }
+
+        div.innerHTML = html;
+        this.messages.appendChild(div);
+        this.scrollToBottom();
+      },
+
+      showTyping: function() {
+        const div = document.createElement('div');
+        div.id = 'typingIndicator';
+        div.className = `flex justify-start chat-enter`;
+        div.innerHTML = `
+          <div class="message-bubble message-bot shadow-sm p-3">
+            <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+          </div>
+        `;
+        this.messages.appendChild(div);
+        this.scrollToBottom();
+        return div;
+      },
+
+      removeTyping: function() {
+        const el = $('typingIndicator');
+        if (el) el.remove();
+      },
+
+      handleUserMessage: function() {
+        const text = this.input.value.trim();
+        if (!text) return;
+
+        this.addMessage(text, 'user');
+        this.input.value = '';
+        this.showTyping();
+
+        setTimeout(() => {
+          this.removeTyping();
+          const response = this.getBotResponse(text.toLowerCase());
+          this.addMessage(response.text, 'bot');
+          if (response.action) response.action();
+        }, 650 + Math.random() * 450);
+      },
+
+      getBotResponse: function(input) {
+        if (input.match(/halo|hai|hello|selamat pagi|siang|sore|malam|pagi|siang/)) {
+          return { text: "Halo! Saya PAMIT-Bot. Jika bingung isi form, tanyakan saja. Ingat: setelah kembali, <b>wajib Kode Konfirmasi</b> ya.", action: null };
+        }
+
+        if (input.match(/makasih|terima kasih|thanks|trims|sip/)) {
+          return { text: "Sama-sama. Jangan lupa ambil Kode Konfirmasi ke Guru Piket sebelum pulang.", action: null };
+        }
+
+        if (input.match(/panduan lengkap|cara mengisi|tutorial|langkah|isi form|mulai dari mana|bantu isi|cara pakai/)) {
+          return {
+            text: `Langkah lengkap:<br>
+            1) <b>Konfigurasi:</b> pilih Jumlah Siswa, lalu pilih <b>Kelas</b>.<br>
+            2) <b>Pernyataan:</b> centang <b>Izin Guru Pengajar</b> & <b>Izin Piket/BK</b>.<br>
+            3) <b>Data Siswa:</b> pilih nama; NIS terisi otomatis.<br>
+            4) <b>Detail:</b> isi alasan, pilih Guru Piket, tanggal, dan pilih <b>Jam Keluar/Kembali (Angka 1-10)</b>.<br>
+            5) Selesai urusan: kembali ke sekolah dan minta <b>Kode Konfirmasi</b>.`,
+            action: () => this.highlightSection('section-config')
+          };
+        }
+
+        if (input.match(/pulang|kembali|selesai|konfirmasi|kode|aturan kepulangan|selesai izin/)) {
+          return {
+            text: `<b>PENTING:</b> setelah urusan izin selesai:<br>
+            1) Kembali ke sekolah tepat waktu.<br>
+            2) Temui Guru Piket/BK/Kesiswaan.<br>
+            3) Lapor sudah kembali.<br>
+            4) Minta <b>Kode Konfirmasi</b> sebagai bukti legalitas pulang.`,
+            action: null
+          };
+        }
+
+        if (input.match(/kelas|konfigurasi|pilih kelas/)) {
+          return { text: `Pilih dulu:<br>1) Jumlah Siswa<br>2) Kelas<br>Setelah itu, daftar siswa muncul.`, action: () => this.highlightSection('section-config') };
+        }
+
+        if (input.match(/nama|siswa|data|tidak muncul|tidak ada|hilang|kosong/)) {
+          return { text: `Jika <b>Nama Siswa</b> tidak muncul:<br>1) Pastikan <b>Kelas</b> sudah dipilih<br>2) Tunggu sebentar (load data)<br>3) Kalau tetap kosong, data kelas belum ada di database/sheet`, action: () => this.highlightSection('section-config') };
+        }
+
+        if (input.match(/centang|cek|persetujuan|izin|guru pengajar|guru piket/)) {
+          return { text: `Checklist wajib:<br>1) Izin ke Guru Pengajar<br>2) Izin ke Guru Piket/BK<br>3) Baru centang dua-duanya di form`, action: () => this.highlightSection('section-checklist') };
+        }
+
+        if (input.match(/detail|keperluan|alasan|angka|skala|1-10/)) {
+          return { text: `Bagian Detail:<br>
+            • Alasan harus jelas<br>
+            • Pilih Guru Piket yang berjaga<br>
+            • Pilih <b>Jam Keluar</b> dan <b>Jam Kembali</b> (Angka 1-10). Pastikan Angka Kembali > Angka Keluar.`, 
+            action: () => this.highlightSection('section-details') 
+          };
+        }
+
+        if (input.match(/gagal|error|tidak bisa kirim|merah|salah|validasi|batal/)) {
+          return { text: `Jika gagal kirim:<br>1) Cek field merah (wajib diisi)<br>2) Checklist harus dua<br>3) Angka Kembali harus lebih besar dari Angka Keluar`, action: () => $('formCard').scrollIntoView({behavior: 'smooth', block: 'center'}) };
+        }
+
+        if (input.match(/lemot|loading|lambat|putih/)) {
+          return { text: `Jika loading lama:<br>1) Cek internet<br>2) Refresh (F5)<br>3) Server mungkin sibuk`, action: null };
+        }
+
+        // Fallback with Admin contact option
+        return { 
+          text: `Maaf, saya kurang mengerti. Jika masalah berlanjut, silakan <b>Hubungi Admin</b> melalui WhatsApp untuk bantuan lebih lanjut.`, 
+          action: null 
+        };
+      },
+
+      highlightSection: function(sectionId) {
+        const el = $(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('ring-4', 'ring-brand-300', 'ring-opacity-50');
+          setTimeout(() => el.classList.remove('ring-4', 'ring-brand-300', 'ring-opacity-50'), 1500);
+        }
+      }
+    };
+
+    /* =========================
+       VALIDATION & SUBMISSION
+    ========================= */
+
+    function validateForm() {
+      let isValid = true;
+      showFormStatus(true, 'Memvalidasi formulir...');
+
+      const requiredFields = ['jumlahSiswa', 'kelas', 'keperluan', 'namaGuru', 'tanggal', 'jamAwal', 'jamAkhir'];
+      requiredFields.forEach(fieldId => {
+        const field = $(fieldId);
+        const val = field ? field.value : '';
+        if (!val) {
+          setError(fieldId, true, `Wajib diisi`);
+          isValid = false;
+        } else {
+          setError(fieldId, false);
+        }
+      });
+
+      const izinPengajar = $('izinPengajar') ? $('izinPengajar').checked : false;
+      const izinPiket = $('izinPiket') ? $('izinPiket').checked : false;
+
+      if (!izinPengajar || !izinPiket) {
+        setChecklistError(true);
+        isValid = false;
+      } else {
+        setChecklistError(false);
+      }
+
+      const studentCount = parseInt($('jumlahSiswa') ? $('jumlahSiswa').value || '0' : '0', 10);
+      for (let i = 1; i <= studentCount; i++) {
+        const namaField = $(`nama${i}`);
+        if (namaField && !namaField.value) {
+          setError(`nama${i}`, true, 'Nama wajib dipilih');
+          isValid = false;
+        }
+      }
+
+      // Validasi Angka 1-10
+      const jamAwal = parseInt($('jamAwal').value, 10);
+      const jamAkhir = parseInt($('jamAkhir').value, 10);
+
+      if (!isNaN(jamAwal) && !isNaN(jamAkhir)) {
+        if (jamAwal >= jamAkhir) {
+          setError('jamAkhir', true, 'Jam Kembali harus lebih besar dari Jam Keluar');
+          isValid = false;
+        }
+      }
+
+      showFormStatus(false);
+
+      if (!isValid) {
+        showToast('Mohon lengkapi semua field yang wajib diisi', 'error');
+        const firstError = document.querySelector('.input-error, .box-error');
+        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        updateFormProgress(90);
+      }
+
+      return isValid;
+    }
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      if (!validateForm()) return;
+
+      setLoading(true);
+
+      const kelasPenuh = $('kelas').value;
+      const parts = (kelasPenuh || "").trim().split(" ");
+
+      const formData = {
+        jumlahSiswa: $('jumlahSiswa').value,
+        angkatan: parts[0] || "",
+        jurusan: parts.slice(1).join(" ") || "",
+        keperluan: $('keperluan').value,
+        namaGuru: $('namaGuru').value,
+        tanggal: $('tanggal').value,
+        jamAwal: $('jamAwal').value,
+        jamAkhir: $('jamAkhir').value,
+        izinPengajar: $('izinPengajar').checked,
+        izinPiket: $('izinPiket').checked,
+        timestamp: new Date().toISOString(),
+        submittedBy: `Web Form ${CONFIG.APP_VERSION}`
+      };
+
+      const studentCount = parseInt(formData.jumlahSiswa, 10);
+      const siswaData = [];
+
+      for (let i = 1; i <= studentCount; i++) {
+        const nama = $(`nama${i}`)?.value || '';
+        const nis = $(`nis${i}`)?.value || '';
+        if (nama) {
+          siswaData.push({
+            no: i,
+            nama,
+            nis,
+            tingkat: formData.angkatan,
+            jurusan: formData.jurusan
+          });
+
+          formData[`nama${i}`] = nama;
+          formData[`nis${i}`] = nis;
+          formData[`tingkat${i}`] = formData.angkatan;
+          formData[`kelas${i}`] = formData.jurusan;
+        }
+      }
+      formData.siswaData = siswaData;
+
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+        showToast('Waktu habis! Server tidak merespon dalam 30 detik.', 'error');
+      }, 30000);
+
+      if (state.isOnline && google?.script?.run) {
+        try {
+          google.script.run
+            .withSuccessHandler(response => {
+              clearTimeout(timeoutId);
+              setLoading(false);
+
+              if (response && response.success) {
+                state.pdfUrl = response.pdfUrl || '';
+                showToast('Permohonan izin berhasil dikirim!', 'success');
+                updateFormProgress(100);
+
+                const actions = $('afterSubmitActions');
+                if (actions) {
+                  actions.classList.remove('hidden');
+                  actions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              } else {
+                showToast((response && response.message) || 'Terjadi kesalahan server', 'error');
+              }
+            })
+            .withFailureHandler(error => {
+              clearTimeout(timeoutId);
+              setLoading(false);
+              console.error('Submission failed:', error);
+              showToast('Gagal mengirim formulir: ' + (error.message || 'Unknown error'), 'error');
+            })
+            .processForm(formData);
+        } catch (error) {
+          clearTimeout(timeoutId);
+          setLoading(false);
+          console.error('Error submitting form:', error);
+          showToast('Terjadi kesalahan sistem', 'error');
+        }
+      } else {
+        clearTimeout(timeoutId);
+        setTimeout(() => {
+          setLoading(false);
+          showToast('Berhasil (Mode Simulasi Offline)', 'success');
+          state.pdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+
+          const actions = $('afterSubmitActions');
+          if (actions) {
+            actions.classList.remove('hidden');
+            actions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          updateFormProgress(100);
+        }, 1200);
+      }
+    }
+
+    /* =========================
+       EVENT LISTENERS
+    ========================= */
+
+    function setupEventListeners() {
+      const on = (id, evt, handler) => {
+        const el = $(id);
+        if (!el) return;
+        el.addEventListener(evt, handler);
+      };
+
+      on('jumlahSiswa', 'change', () => {
+        state.selectedNames.clear();
+        renderStudents();
+        syncFilledState($('jumlahSiswa'));
+      });
+
+      on('kelas', 'change', () => {
+        syncFilledState($('kelas'));
+        onKelasChange();
+      });
+
+      on('izinPengajar', 'change', () => setChecklistError(false));
+      on('izinPiket', 'change', () => setChecklistError(false));
+
+      on('permissionForm', 'submit', handleFormSubmit);
+      on('printPdfBtn', 'click', printPdfDirectly);
+
+      on('resetBtn', 'click', () => {
+        state.selectedNames.clear();
+        state.currentNamaList = [];
+        state.currentNamaMap = {};
+
+        $('afterSubmitActions')?.classList.add('hidden');
+        $('permissionForm')?.reset();
+
+        renderStudents();
+        updateFormProgress(25);
+        showToast('Formulir direset', 'info');
+
+        initFilledStateAll();
+      });
+
+      document.querySelectorAll('input.input-field, select.input-field').forEach(el => {
+        el.addEventListener('input', () => syncFilledState(el));
+        el.addEventListener('change', () => syncFilledState(el));
+      });
+    }
+
+    /* =========================
+       INIT
+    ========================= */
+
+    function initForm() {
+      const jumlahSiswaSelect = $('jumlahSiswa');
+      if (jumlahSiswaSelect) {
+        jumlahSiswaSelect.innerHTML = '<option value="" disabled selected>&nbsp;</option>';
+        for (let i = 1; i <= CONFIG.MAX_STUDENTS; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = `${i} Siswa`;
+          jumlahSiswaSelect.appendChild(option);
+        }
+        jumlahSiswaSelect.value = '1';
+      }
+
+      const tanggalEl = $('tanggal');
+      if (tanggalEl) {
+        const today = new Date().toISOString().split('T')[0];
+        tanggalEl.value = today;
+        tanggalEl.min = today;
+      }
+
+      // Isi dropdown Angka 1-10
+      fillNumberSelects();
+
+      loadDataFromSpreadsheet();
+      setupEventListeners();
+      renderStudents();
+
+      ChatBot.init();
+
+      initFilledStateAll();
+      updateFormProgress(25);
+    }
+
+    document.addEventListener('DOMContentLoaded', initForm);
+  </script>
+</body>
+</html>

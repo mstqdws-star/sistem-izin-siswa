@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistik Izin Hari Ini</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#2563eb',
+            accent: '#10b981',
+            dark: '#1e293b',
+            error: '#ef4444',
+            success: '#22c55e',
+            info: '#0ea5e9'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-cyan-50 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
+      <div class="p-6 bg-gradient-to-r from-primary to-secondary">
+        <h1 class="text-2xl font-bold text-white flex items-center">
+          <i class="fas fa-chart-bar mr-3"></i>
+          Statistik Izin Hari Ini
+        </h1>
+      </div>
+      
+      <div class="p-6">
+        <div id="statsContainer" class="space-y-6">
+          <div class="flex justify-center">
+            <div class="loading-spinner" id="loadingSpinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center text-gray-500 text-sm">
+      <p>Sistem Izin Digital Sekolah © 2025</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadStats();
+      
+      // Auto-refresh every 5 minutes
+      setInterval(loadStats, 5 * 60 * 1000);
+    });
+    
+    function loadStats() {
+      const statsContainer = document.getElementById('statsContainer');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      
+      // Show loading state
+      statsContainer.innerHTML = '';
+      loadingSpinner.classList.remove('hidden');
+      
+      google.script.run
+        .withSuccessHandler(function(response) {
+          loadingSpinner.classList.add('hidden');
+          
+          if (response.error) {
+            statsContainer.innerHTML = `
+              <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                ${response.error}
+              </div>
+            `;
+            return;
+          }
+          
+          // Calculate completion percentage
+          const completedToday = response.totalToday - response.pendingToday;
+          const completionPercent = response.totalToday > 0 
+            ? Math.round((completedToday / response.totalToday) * 100)
+            : 0;
+            
+          // Create stats HTML
+          let statsHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                <div class="text-4xl font-bold text-blue-600 mb-2">${response.totalToday}</div>
+                <div class="text-gray-600">Total Izin Hari Ini</div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                <div class="text-4xl font-bold text-green-600 mb-2">${completedToday}</div>
+                <div class="text-gray-600">Izin Selesai</div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl border border-amber-200">
+                <div class="text-4xl font-bold text-amber-600 mb-2">${response.pendingToday}</div>
+                <div class="text-gray-600">Belum Dikonfirmasi</div>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-700">Progress Konfirmasi</span>
+                <span class="font-bold text-primary">${completionPercent}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-gradient-to-r from-primary to-secondary h-4 rounded-full" 
+                     style="width: ${completionPercent}%"></div>
+              </div>
+            </div>
+          `;
+          
+          // Add pending names list if any
+          if (response.pendingToday > 0) {
+            statsHTML += `
+              <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl border border-amber-200">
+                <h3 class="text-lg font-semibold text-amber-800 mb-4 flex items-center">
+                  <i class="fas fa-exclamation-triangle mr-2"></i>
+                  Daftar Siswa Belum Konfirmasi
+                </h3>
+                <div class="space-y-2">
+                  ${response.pendingNames.map(name => `
+                    <div class="flex items-center bg-white p-3 rounded-lg shadow-sm">
+                      <i class="fas fa-user text-gray-400 mr-3"></i>
+                      <span class="font-medium">${name}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          } else if (response.totalToday > 0) {
+            statsHTML += `
+              <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200 text-center">
+                <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
+                <h3 class="text-lg font-semibold text-green-800">Semua izin hari ini sudah dikonfirmasi!</h3>
+              </div>
+            `;
+          } else {
+            statsHTML += `
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 text-center">
+                <i class="fas fa-info-circle text-blue-500 text-4xl mb-3"></i>
+                <h3 class="text-lg font-semibold text-blue-800">Belum ada izin hari ini</h3>
+              </div>
+            `;
+          }
+          
+          // Add date info
+          statsHTML += `
+            <div class="text-center text-sm text-gray-500 mt-6">
+              Data per ${response.date}
+            </div>
+          `;
+          
+          statsContainer.innerHTML = statsHTML;
+        })
+        .withFailureHandler(function(error) {
+          loadingSpinner.classList.add('hidden');
+          statsContainer.innerHTML = `
+            <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
+              <i class="fas fa-exclamation-circle mr-2"></i>
+              Gagal memuat statistik: ${error.message || 'Tidak diketahui
